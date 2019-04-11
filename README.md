@@ -9,7 +9,8 @@
 [Saiba como ativar o faturamento](https://cloud.google.com/billing/docs/how-to/modify-project "Saiba como ativar o faturamento")
 5. Ter acesso ao Cloud shell
 6. Configure a região padrão:
-`gcloud config set compute/region southamerica-east1`
+
+`gcloud config set compute/zone southamerica-east1-a`
 
 ### Passo 1: Criar um Clusters
 
