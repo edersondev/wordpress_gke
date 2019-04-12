@@ -15,7 +15,7 @@ spec:
         app: wordpress
     spec:
       containers:
-        - image: wordpress
+        - image: wordpress:php7.3
           name: wordpress
           ports:
             - containerPort: 80
@@ -25,24 +25,6 @@ spec:
             value: 127.0.0.1:3306
           - name: WORDPRESS_DB_NAME
             value: <DB_NAME>
-          # [START] Authentication Unique Keys and Salts.
-          -name: WORDPRESS_AUTH_KEY
-            value: 'B*~ZQ(Mok+{L-mvqk/-{Zuf5snUM(|P6)5RjT|+Y`!,W*543>%K]UZ5n&H/6HlHy'
-          -name: WORDPRESS_SECURE_AUTH_KEY
-            value: 'vkvtC1#}l4k,3yj7X:ndn``.<Vy+^dSkxE,05+ap;<p_vKWsmhYS+tlH;m=Lu|p!'
-          -name: WORDPRESS_LOGGED_IN_KEY: 
-            value: 'Yi[XXYm8.kBKc]gIM|(G|hsm3pF_4)C_A~C1Q2`fEftH!0:EF%Q*;76b/`V3-2E_'
-          -name: WORDPRESS_NONCE_KEY
-            value: '2~8=eI qN#oK<8Wg|8})HxmwSx0tUH-MxY;m+TxVlVI:K}9||qI_~St^gd0;xT.R'
-          -name: WORDPRESS_AUTH_SALT
-            value: 'oR)Zn^QlDs-?l,bFsnNFRG^|HG=~.XU<6 vF,1e- wJj<bGYt<d]:w3i-QuZXM0u'
-          -name: WORDPRESS_SECURE_AUTH_SALT
-            value: 'f7y%BNcT>LGJ*,NxBg&/0~W{(L~LM<xid?E^eF26_A-ysGu}iwvyX4#|+4O~A-zm'
-          -name: WORDPRESS_LOGGED_IN_SALT
-            value: 'Yg)Xd2ZPc-{/K#Embkj/!6Q28#;EWJ]X~+`a&^J0S7v-!Q|;uFir*@a 4+Y<PmDW'
-          -name: WORDPRESS_NONCE_SALT
-            value: '+g+D7DSvpn4+p4eqiVz%A0c)|ou-HT,Fbu1#KUQ_m|5cpHNb,W[R*oa|e=W*tHB@'
-          # [END] Authentication Unique Keys and Salts.
           - name: WORDPRESS_CONFIG_EXTRA
             value: |
               define('FS_METHOD', 'direct');
