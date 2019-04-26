@@ -15,10 +15,19 @@ spec:
         app: wordpress
     spec:
       containers:
-        - image: wordpress:php7.3
-          name: wordpress
+        - image: nginx:1.5
+          name: nginx
           ports:
             - containerPort: 80
+            - containerPort: 443
+              name: nginx
+          volumeMounts:
+            - name: wordpress-persistent-storage
+              mountPath: /var/www/html
+        - image: wordpress:php7.3-fpm
+          name: wordpress
+          ports:
+            - containerPort: 9000
               name: wordpress
           env:
           - name: WORDPRESS_DB_HOST
