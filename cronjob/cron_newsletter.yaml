@@ -1,0 +1,16 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: cron-newsletter
+spec:
+  schedule: "0 12  * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: cron-newsletter
+            image: appropriate/curl
+            args:
+            - http://www.poder360.com.br/wp-content/themes/poder360/cron/remove_newsletter.php
+          restartPolicy: OnFailure

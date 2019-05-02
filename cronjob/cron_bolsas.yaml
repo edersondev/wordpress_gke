@@ -1,0 +1,16 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: cron-bolsas
+spec:
+  schedule: "*/30 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: cron-bolsas
+            image: appropriate/curl
+            args:
+            - http://www.poder360.com.br/wp-content/themes/poder360/cron/bolsas_cambio.php
+          restartPolicy: OnFailure

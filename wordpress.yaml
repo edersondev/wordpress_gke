@@ -15,25 +15,17 @@ spec:
         app: wordpress
     spec:
       containers:
-        - image: nginx:1.5
-          name: nginx
+        - image: gcr.io/poder360-dev/wordpress:apache
+          name: wordpress
           ports:
             - containerPort: 80
             - containerPort: 443
-              name: nginx
-          volumeMounts:
-            - name: wordpress-persistent-storage
-              mountPath: /var/www/html
-        - image: wordpress:php7.3-fpm
-          name: wordpress
-          ports:
-            - containerPort: 9000
               name: wordpress
           env:
           - name: WORDPRESS_DB_HOST
             value: 127.0.0.1:3306
           - name: WORDPRESS_DB_NAME
-            value: <DB_NAME>
+            value: poder360
           - name: WORDPRESS_CONFIG_EXTRA
             value: |
               define('FS_METHOD', 'direct');

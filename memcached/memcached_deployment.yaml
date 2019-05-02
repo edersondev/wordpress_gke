@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memcached
+  labels:
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: memcached
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: memcached
+        tier: backend
+    spec:
+      containers:
+      - name: memcached
+        image: memcached:1.5-alpine

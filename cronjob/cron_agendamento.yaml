@@ -1,0 +1,16 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: cron-agendamento
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: cron-agendamento
+            image: appropriate/curl
+            args:
+            - http://www.poder360.com.br/wp-cron.php?doing_wp_cron
+          restartPolicy: OnFailure

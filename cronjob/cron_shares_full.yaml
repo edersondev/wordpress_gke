@@ -1,0 +1,16 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: cron-shares-full
+spec:
+  schedule: "0 8   * * 0"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: cron-shares-full
+            image: appropriate/curl
+            args:
+            - http://www.poder360.com.br/_elav_update_full
+          restartPolicy: OnFailure

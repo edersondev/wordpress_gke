@@ -1,0 +1,16 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: cron-alertas
+spec:
+  schedule: "0  8 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: cron-alertas
+            image: appropriate/curl
+            args:
+            - http://www.poder360.com.br/alertas/send_alertas_emails/
+          restartPolicy: OnFailure

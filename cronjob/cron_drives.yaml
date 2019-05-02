@@ -1,0 +1,16 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: cron-drives
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: cron-drives
+            image: appropriate/curl
+            args:
+            - http://www.poder360.com.br/wp-content/themes/poder360/cron/get_drives.php
+          restartPolicy: OnFailure

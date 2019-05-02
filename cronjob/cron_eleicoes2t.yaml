@@ -1,0 +1,16 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: cron-eleicoes2t
+spec:
+  schedule: "*/10 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: cron-eleicoes2t
+            image: appropriate/curl
+            args:
+            - http://www.poder360.com.br/wp-content/themes/poder360/cron/eleicoes_2t.php
+          restartPolicy: OnFailure
