@@ -1,17 +1,17 @@
 #!/bin/bash
 
-PROJECT=$(gcloud config get-value project)
-REGION=southamerica-east1
-ZONE=${REGION}-b
-CLUSTER=gke-load-test
-TARGET=www.poder360.com.br
-gcloud config set compute/region $REGION 
-gcloud config set compute/zone $ZONE
-
-if [ "$1" = "delete" ] ; then
-	gcloud container clusters delete $CLUSTER --zone $ZONE
+if [ ! $1 ] ; then
+	echo "Informe o alvo, endereço IP ou url"
 	exit
 fi
+
+PROJECT=$(gcloud config get-value project)
+REGION=us-central1
+ZONE=${REGION}-b
+CLUSTER=gke-load-test
+TARGET=$1
+gcloud config set compute/region $REGION 
+gcloud config set compute/zone $ZONE
 
 gcloud services enable \
     cloudbuild.googleapis.com \
@@ -34,7 +34,14 @@ gcloud container clusters get-credentials $CLUSTER \
  
 git clone https://github.com/GoogleCloudPlatform/distributed-load-testing-using-kubernetes.git gke-load-test
 
-pushd gke-load-test
+cp tasks.py gke-load-test/docker-image/locust-tasks
+
+cp config/locust-master-controller.yaml gke-load-test/kubernetes-config
+cp config/locust-worker-controller.yaml gke-load-test/kubernetes-config
+
+cd gke-load-test
+
+gcloud builds submit --tag gcr.io/$PROJECT/locust-tasks:latest docker-image/.
 
 sed -i -e "s/\[TARGET_HOST\]/$TARGET/g" kubernetes-config/locust-master-controller.yaml
 sed -i -e "s/\[TARGET_HOST\]/$TARGET/g" kubernetes-config/locust-worker-controller.yaml
@@ -47,4 +54,4 @@ kubectl apply -f kubernetes-config/locust-worker-controller.yaml
 
 EXTERNAL_IP=$(kubectl get svc locust-master -o yaml | grep ip | awk -F":" '{print $NF}')
 
-echo "http://$EXTERNAL_IP:8089"
+echo "Acesse o IP com a porta 8089"
