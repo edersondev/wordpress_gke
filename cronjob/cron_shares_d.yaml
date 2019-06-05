@@ -14,3 +14,4 @@ spec:
             args:
             - http://www.poder360.com.br/_elav_update_seven
           restartPolicy: OnFailure
+

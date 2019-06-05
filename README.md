@@ -22,15 +22,14 @@ O primeiro passo é criar um cluster GKE para hospedar seus contêineres do site
 
 Para criar o armazenamento necessário para o site, o primeiro passo é criar as reivindicações de volumes permanentes.
 
-Você usará o arquivo [wordpress-volumeclaim.yaml](https://github.com/edersondev/wordpress_gke/raw/master/wordpress-volumeclaim.yaml "wordpress-volumeclaim.yaml") para criar a reivindicação de volumes permanentes necessários para as implementações.
-
-Baixe o arquivo yaml para dentro do Cloud Shell, se preferir crie uma pasta para guardar o arquivo, use o seguinte comando para baixar:
-`wget https://github.com/edersondev/wordpress_gke/raw/master/wordpress-volumeclaim.yaml`
+Você usará o arquivo application/dir_volume.yaml para criar a reivindicação de volumes permanentes necessários para as implementações.
 
 Execute o comando para criar o volume:
-`kubectl apply -f wordpress-volumeclaim.yaml`
+
+`kubectl apply -f application/dir_volume.yaml`
 
 Execute o seguinte comando para verificar se as reivindicações estão vinculadas.
+
 `kubectl get pvc`
 
 ### Passo 3: Criação Instância Cloud SQL
@@ -50,7 +49,7 @@ Execute o seguinte comando para verificar se as reivindicações estão vinculad
 
 ### Passo 4: Como conectar a partir do GKE
 
-#### IntroduçãoIntrodução
+#### Introdução
 
 Para acessar uma instância do Cloud SQL a partir de um aplicativo em execução no Kubernetes Engine, use a imagem Docker do Cloud SQL Proxy. O Cloud SQL Proxy é adicionado ao seu pod usando o padrão de contêiner "arquivo secundário". Dessa forma, o contêiner de proxy está no mesmo conjunto que seu aplicativo, permitindo que o aplicativo se conecte ao proxy usando o localhost e aumentando a segurança e o desempenho.
 
@@ -93,63 +92,89 @@ Você fornecerá esse valor posteriormente como INSTANCE_CONNECTION_NAME.
 ### 4.4: Criar as chaves secretas
 
 Você precisa de duas chaves secretas para permitir que seu aplicativo do GKE acesse os dados em sua instância do Cloud SQL:
-- a chave secreta cloudsql-instance-credentials que contém a conta de serviço
-- a chave secreta cloudsql-db-credentials que fornece a conta de usuário e a senha do proxy
+- a chave secreta credenciais-instancia-cloudsql que contém a conta de serviço
+- a chave secreta credenciais-db-cloudsql que fornece a conta de usuário e a senha do proxy
 
 Para criar essas chaves secretas:
 
-1. Crie a chave secreta cloudsql-instance-credentials usando o arquivo de chave que você baixou anteriormente:
+1. Crie a chave secreta credenciais-instancia-cloudsql usando o arquivo de chave que você baixou anteriormente:
 
-`kubectl create secret generic cloudsql-instance-credentials --from-file=credentials.json=[PROXY_KEY_FILE_PATH]`
+`kubectl create secret generic credenciais-instancia-cloudsql --from-file=credentials.json=[PROXY_KEY_FILE_PATH]`
 
-2. Crie a chave secreta cloudsql-db-credentials usando o nome e a senha do usuário do banco de dados que você criou anteriormente:
+2. Crie a chave secreta credenciais-db-cloudsql usando o nome e a senha do usuário do banco de dados que você criou anteriormente:
 
-`kubectl create secret generic cloudsql-db-credentials --from-literal=username=[DBUSER] --from-literal=password=[PASSWORD]`
+`kubectl create secret generic credenciais-db-cloudsql --from-literal=username=[DBUSER] --from-literal=password=[PASSWORD]`
 
-### 4.5: Deploy WordPress
+### Passo 5: Implantação do PHP FPM
+
+### 5.1: Gerar Imagem Docker
+
+Necessário criar a imagem que irá rodar dentros dos container. O arquivo Dockerfile está dentro da pasta image-php. Você pode executar o build da imagem dentro do Google Shell, substitua o nome $PROJECT pelo nome do projeto onde vai ficar a imagem, por exemplo poder360-dev:
+
+`gcloud builds submit --tag gcr.io/$PROJECT/wordpress:fpm imagem-php/.`
+
+### 5.2: Implantação WordPress FPM
 
 O próximo passo é fazer o deploy do container Wordpress no cluster. O arquivo de reivindicação para o deploy de uma instância Wordpress.
-[wordpress.yaml](https://github.com/edersondev/wordpress_gke/raw/master/wordpress.yaml "wordpress.yaml")
+application/php_deployment.yaml
 
 Do arquivo yaml alterar somente as strings “<DB_NAME>” com o nome do banco criado na instância e  "<INSTANCE_CONNECTION_NAME>" pelo nome solicitado no item 4.3.
 
 Para fazer o deploy rode o comando abaixo:
 
-`kubectl create -f wordpress.yaml`
+`kubectl create -f php_deployment.yaml`
 
 Para atualizações no arquivo execute o seguinte comando:
 
-`kubectl apply -f wordpress.yaml`
+`kubectl apply -f php_deployment.yaml`
 
 Verifique se o Pod está em execução. Pode levar alguns minutos para que o Pod faça a transição para o status de execução, já que anexar o disco permanente ao nó de cálculo leva um tempo:
 
-`kubectl get pod -l app=wordpress`
+`kubectl get pod -l app=php`
 
-### 4.6: Expor o serviço
+### 5.3: Expor o serviço PHP FPM
 
-Na etapa anterior, você implantou um contêiner do WordPress que não está acessível de fora do cluster, pois não tem um endereço IP externo.
+O deploy da etapa anterior irá rodar na porta 9000 como um serviço e vai rodar em conjunto com o Nginx. Execute o seguinte comando:
 
-Para expor seu aplicativo WordPress ao tráfego da Internet usando um balanceador de carga (sujeito a cobrança), você precisa de um Serviço com o tipo: LoadBalancer.
+`kubectl apply -f application/php_service.yaml`
 
-O arquivo [wordpress-service.yaml](https://github.com/edersondev/wordpress_gke/raw/master/wordpress-service.yaml "wordpress-service.yaml") contém o reivindicação deste Serviço.
+### Passo 6: Implantação do PHP FPM
 
-Para fazer o deploy do serviço rode o comando abaixo:
+### 6.1: Implantação do arquivo configMap do Nginx
 
-`kubectl create -f wordpress-service.yaml`
+Nossa aplicação irá usar o servidor web Nginx e para a configuração do mesmo iremos usar o configMap que está no arquivo application/nginx_configMap.yaml. Execute o seguinte comando:
 
-A implantação(deploy) dessa reivindicação criará um balanceador de carga, o que pode levar alguns minutos. Execute o seguinte comando para descobrir o endereço IP externo site:
+`kubectl apply -f application/nginx_configMap.yaml`
 
-`kubectl get svc -l app=wordpress`
+Esse arquivo faz a comunicação do nosso deploy PHP com o servidor web Nginx.
 
-Saída esperada:
+### 6.2: Implantação do Nginx
 
-    NAME        CLUSTER-IP      EXTERNAL-IP    PORT(S)        AGE
-    wordpress   10.51.243.233   203.0.113.3    80:32418/TCP   1m
+Para fazer a implantação execute o seguinte comando:
 
-Na saída acima, a coluna EXTERNAL-IP mostrará o endereço IP público criado para o site.
+`kubectl apply -f application/nginx_deployment.yaml`
+
+Nessa etapa não é necessário fazer nenhuma alteração no arquivo.
+
+### 6.3: Expor o serviço Nginx
+
+Para expor o serviço Nginx referente a etapa anterior execute o seguinte comando:
+
+`kubectl expose deployment nginx --target-port=80 --type=NodePort`
+
+### 6.4: Criação do balanceador de carga com Entrada(ingress)
+
+Para expor a aplicação ao público execute o seguinte comando:
+
+`kubectl apply -f application/basic-ingress.yaml`
+
+O balanceador leva uns cinco minutos para ficar pronto.
+
 
 ### Referências
 - [Using Persistent Disks with WordPress and MySQL](https://cloud.google.com/kubernetes-engine/docs/tutorials/persistent-disk#set-defaults-for-the-gcloud-command-line-tool "Using Persistent Disks with WordPress and MySQL")
 - [kubernetes-engine-samples](https://github.com/GoogleCloudPlatform/kubernetes-engine-samples "kubernetes-engine-samples")
 - [Como conectar a partir do GKE](https://cloud.google.com/sql/docs/mysql/connect-kubernetes-engine "Como conectar a partir do GKE")
 - [Como criar instâncias Cloud SQL](https://cloud.google.com/sql/docs/mysql/create-instance "Como criar instâncias Cloud SQL")
+- [ConfigMap](https://cloud.google.com/kubernetes-engine/docs/concepts/configmap?hl=pt-br "ConfigMap")
+- [Ingress](https://cloud.google.com/kubernetes-engine/docs/tutorials/http-balancer?hl=pt-br "Ingress")

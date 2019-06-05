@@ -1,0 +1,17 @@
+kubectl apply -f php_service.yaml
+
+kubectl apply -f dir_volume.yaml
+
+kubectl create secret generic credenciais-instancia-cloudsql --from-file=credentials.json=poder360-dev-3afae4757f99.json
+
+kubectl create secret generic credenciais-db-cloudsql --from-literal=username=wpuserpoder --from-literal=password=zCcCMyN9WrMe26e
+
+kubectl apply -f php_deployment.yaml
+
+kubectl apply -f nginx_configMap.yaml
+
+kubectl apply -f nginx_deployment.yaml
+
+kubectl expose deployment nginx --target-port=80 --type=NodePort
+
+kubectl apply -f basic-ingress.yaml

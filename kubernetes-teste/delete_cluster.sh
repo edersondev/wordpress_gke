@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROJECT=$(gcloud config get-value project)
-REGION=southamerica-east1
+REGION=us-central1
 ZONE=${REGION}-b
 CLUSTER=gke-load-test
 gcloud config set compute/region $REGION 

@@ -1,5 +1,11 @@
 # Teste distribuido usando Google Cloud Kubernetes
 
-Faça o upload do arquivo create_cluster.sh para sua pasta pessoal do cloud sheel. Execute o arquivo para a criação do cluster com o Locust.
+Para criar o cluster do Locust execute o seguinte comando:
 
-Para limpar o cluster basta executar o mesmo arquivo informando o parametro delete.
+`sh create_cluster.sh <IP_DOMINIO>`
+
+O paramêtro pode ser um número IP ou o nome de um domínio. Aguarde a criação do cluster e ao terminar acesse o menu Serviços e clique no IP na porta 8089.
+
+Depois que terminou os testes você pode apagar o cluster com o seguinte comando:
+
+`sh delete_cluster.sh`

@@ -14,3 +14,4 @@ spec:
             args:
             - http://www.poder360.com.br/alertas/send_alertas_emails/
           restartPolicy: OnFailure
+

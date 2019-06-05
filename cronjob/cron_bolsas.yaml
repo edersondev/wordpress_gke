@@ -14,3 +14,4 @@ spec:
             args:
             - http://www.poder360.com.br/wp-content/themes/poder360/cron/bolsas_cambio.php
           restartPolicy: OnFailure
+

@@ -14,3 +14,4 @@ spec:
             args:
             - http://www.poder360.com.br/alertas/update_post_index/
           restartPolicy: OnFailure
+

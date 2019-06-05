@@ -14,3 +14,4 @@ spec:
             args:
             - http://www.poder360.com.br/wp-cron.php?doing_wp_cron
           restartPolicy: OnFailure
+
