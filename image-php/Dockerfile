@@ -8,8 +8,14 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update && apt-get install -y \
   libtidy-dev \
   zlib1g-dev \
-  libmemcached-dev
+  libmemcached-dev \
+  locales
+  
+RUN localedef -i pt_BR -c -f UTF-8 -A /usr/share/locale/locale.alias pt_BR.UTF-8
 
+ENV LANG pt_BR.UTF-8
+ENV LC_ALL pt_BR.UTF-8
+  
 RUN pecl install apcu \
   pecl install msgpack \
   pecl install igbinary
