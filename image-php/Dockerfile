@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y \
   libtidy-dev \
   zlib1g-dev \
   libmemcached-dev \
-  locales
+  locales \
+  git
   
 RUN localedef -i pt_BR -c -f UTF-8 -A /usr/share/locale/locale.alias pt_BR.UTF-8
 
