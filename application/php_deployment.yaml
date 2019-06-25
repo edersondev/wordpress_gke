@@ -34,6 +34,8 @@ spec:
         - name: WORDPRESS_CONFIG_EXTRA
           value: |
             define('FS_METHOD', 'direct');
+            define( 'DISABLE_WP_CRON', true );
+            define( 'DISALLOW_FILE_MODS', true );            
         # [START cloudsql_secrets]
         - name: WORDPRESS_DB_USER
           valueFrom:
