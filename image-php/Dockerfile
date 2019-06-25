@@ -52,4 +52,5 @@ RUN { \
     echo 'date.timezone = "America/Sao_Paulo"'; \
     echo 'max_input_vars = 4000'; \
     echo 'realpath_cache_ttl = 300'; \
+    echo 'output_buffering = 4096'; \
 } > /usr/local/etc/php/conf.d/extra-conf.ini
