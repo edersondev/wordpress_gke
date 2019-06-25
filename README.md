@@ -170,6 +170,16 @@ Para expor a aplicação ao público execute o seguinte comando:
 
 O balanceador leva uns cinco minutos para ficar pronto.
 
+### Acessando um POD
+
+Para acessar um POD primeiro você precisa se conectar ao cluster:
+`gcloud container clusters get-credentials cluster-poder360 --zone southamerica-east1-c --project poder360-dev`
+
+Depois de conectado veja a lista de POD's:
+`kubectl get pods`
+
+Para acessar o POD digite o seguinte comando:
+`kubectl exec -it <NOME_POD> -- /bin/bash`
 
 ### Referências
 - [Using Persistent Disks with WordPress and MySQL](https://cloud.google.com/kubernetes-engine/docs/tutorials/persistent-disk#set-defaults-for-the-gcloud-command-line-tool "Using Persistent Disks with WordPress and MySQL")
